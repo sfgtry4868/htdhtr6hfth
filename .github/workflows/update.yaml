@@ -1,0 +1,35 @@
+name: Update Subscription
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # اجرا در دقیقه صفر هر ساعت (هر ۱ ساعت)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Run script
+        run: python main.py
+
+      - name: Commit result
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add sub.txt
+          git diff-index --quiet HEAD || git commit -m "Update sub hourly with flags"
+          git push
